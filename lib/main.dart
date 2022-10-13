@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smol2/shortcuts.dart';
 import 'package:smol2/utils.dart';
+import 'package:watcher/watcher.dart';
 
 import 'menu.dart';
 import 'models/settings.dart';
@@ -75,7 +76,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // loadGameData(ref);
+      var directory =
+          Directory("C:/Program Files (x86)/Fractal Softworks/Starsector/mods");
+
+      directory.listSync().forEach((element) {
+        Fimber.d("Watching $element");
+        DirectoryWatcher(directory.path).events.listen((event) {
+          Fimber.d("${event.type} ${event.path}");
+        });
+      });
     });
   }
 }
