@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smol2/appState.dart';
+import 'package:smol2/models/version.dart';
 
 class TheGrid extends ConsumerStatefulWidget {
   const TheGrid({Key? key}) : super(key: key);
@@ -11,58 +12,43 @@ class TheGrid extends ConsumerStatefulWidget {
 }
 
 class _TheGridState extends ConsumerState<TheGrid> {
-  var sortColumn = 0;
+  var _sortColumn = 0;
+  var _isAsc = true;
 
   @override
   Widget build(BuildContext context) {
-    var mods = ref
-        .watch(AppState.mods);
+    final mods = ref.watch(AppState.mods)..sort((l, r) {
+      switch (_sortColumn) {
+        case 0:
+          return l.name?.compareTo(r.name ?? "") ?? 0;
+        case 1:
+          return l.version?.raw?.compareTo(r.version?.raw ?? "") ?? 0;
+        case 2:
+          return l.author?.compareTo(r.author ?? "") ?? 0;
+        default:
+          return l.name?.compareTo(r.name ?? "") ?? 0;
+      }
+    });
+    final columnNames = ["Name", "Version", "Author"];
 
     return DataTable2(
-      sortColumnIndex: sortColumn,
-      columns: <DataColumn>[
-        DataColumn(
-          label: TextButton(
-            onPressed: () {
-              setState(() {
-                sortColumn = 0;
-              });
-            },
-            child: Text(
-              'Name',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ),
-        DataColumn(
-          label: TextButton(
-            onPressed: () {
-              setState(() {
-                sortColumn = 1;
-              });
-            },
-            child: Text(
-              'Version',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ),
-        DataColumn(
-          label: TextButton(
-            onPressed: () {
-              setState(() {
-                sortColumn = 2;
-              });
-            },
-            child: Text(
-              'Author',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ),
-      ],
-      rows:
-          mods.map((e) => DataRow(
+      sortColumnIndex: _sortColumn,
+      sortAscending: _isAsc,
+      columns: columnNames
+          .map((name) => DataColumn(
+              label: Text(
+                name,
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              onSort: (index, isAsc) {
+                setState(() {
+                  _sortColumn = index;
+                  _isAsc = isAsc;
+                });
+              }))
+          .toList(),
+      rows: mods
+          .map((e) => DataRow(
                 cells: <DataCell>[
                   DataCell(Text(e.name ?? "")),
                   DataCell(Text(e.version.toString() ?? "")),
