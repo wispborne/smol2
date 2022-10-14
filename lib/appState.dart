@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smol2/models/modInfo.dart';
 
 // final appState = StateProvider((ref) => AppState());
 
 abstract class AppState {
-  // static final programMode = StateProvider((ref) => ProgramMode.ship);
+  static final mods = StateProvider<List<ModInfo>>((ref) => []);
 }
 
 extension SetAdding on Map<String, Set<String>> {

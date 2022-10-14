@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smol2/appState.dart';
 import 'package:smol2/modLoader.dart';
 import 'package:smol2/shortcuts.dart';
+import 'package:smol2/theGrid.dart';
 import 'package:smol2/utils.dart';
 
 import 'menu.dart';
@@ -67,6 +69,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       body: Column(
         children: [
           Row(children: const [Expanded(child: WaseMenu())]),
+          Expanded(child: TheGrid())
           // Text(ref.watch(AppState.ship)?.toString() ?? "")
         ],
       ),
@@ -90,7 +93,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           Fimber.i("Loading ${modInfoFile.path}");
           return loadModInfo(modInfoFile as File).then((value) {
             Fimber.d(value?.toString() ?? "");
-            loadedCount++;
+            if (value != null) {
+              loadedCount++;
+              ref
+                  .read(AppState.mods.notifier)
+                  .update((state) => state..add(value));
+            }
           }).catchError((error, stackTrace) {
             failedCount++;
             Fimber.w("Failed to parse ${modInfoFile.path}",
