@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smol2/modLoader.dart';
 import 'package:smol2/shortcuts.dart';
 import 'package:smol2/utils.dart';
-import 'package:watcher/watcher.dart';
 
 import 'menu.dart';
 import 'models/settings.dart';
 
 void main() {
   Fimber.plantTree(
-      DebugTree.elapsed(logLevels: ["I", "W", "E"], useColors: true));
+      DebugTree.elapsed(logLevels: ["D", "I", "W", "E"], useColors: true));
   Fimber.i("Logging started.");
   Fimber.i(
       "Platform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}.");
@@ -66,7 +66,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     return Scaffold(
       body: Column(
         children: [
-          Row(children: [const Expanded(child: WaseMenu())]),
+          Row(children: const [Expanded(child: WaseMenu())]),
           // Text(ref.watch(AppState.ship)?.toString() ?? "")
         ],
       ),
@@ -79,12 +79,37 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       var directory =
           Directory("C:/Program Files (x86)/Fractal Softworks/Starsector/mods");
 
-      directory.listSync().forEach((element) {
-        Fimber.d("Watching $element");
-        DirectoryWatcher(directory.path).events.listen((event) {
-          Fimber.d("${event.type} ${event.path}");
-        });
-      });
+      if (true) {
+        final timer = Stopwatch()..start();
+        var loadedCount = 0;
+        var failedCount = 0;
+        directory
+            .list(recursive: true)
+            .where((file) =>
+                (file is File) && file.uri.pathSegments.last == "mod_info.json")
+            .asyncMap((modInfoFile) {
+          Fimber.i("Loading ${modInfoFile.path}");
+          return loadModInfo(modInfoFile as File).then((value) {
+            Fimber.d(value?.toString() ?? "");
+            loadedCount++;
+          }).catchError((error, stackTrace) {
+            failedCount++;
+            Fimber.w("Failed to parse ${modInfoFile.path}",
+                ex: error, stacktrace: stackTrace);
+          });
+        })
+        .listen((event) { }, onDone: () => Fimber.i("Finished loading $loadedCount mod infos in ${timer.elapsedMilliseconds} ms ($failedCount failed)."));
+      }
+
+      // directory.list().where((file) => file is Directory).forEach((element) {
+      //   Fimber.d("Watching $element");
+      //   directory.watch(recursive: true)
+      //       .listen((event) {
+      //     Fimber.d("$event");
+      //   },
+      //           onError: (e) => Fimber.w(e),
+      //           onDone: () => Fimber.i("Stopped watching ${directory.path}"));
+      // });
     });
   }
 }
