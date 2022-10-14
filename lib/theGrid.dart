@@ -1,3 +1,4 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smol2/appState.dart';
@@ -14,40 +15,40 @@ class _TheGridState extends ConsumerState<TheGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return DataTable(
+    var mods = ref
+        .watch(AppState.mods);
+
+    return DataTable2(
       sortColumnIndex: sortColumn,
       columns: <DataColumn>[
         DataColumn(
-          label: Expanded(
-            child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    sortColumn = 0;
-                  });
-                },
-                child: Text(
-                  'Name',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                )),
+          label: TextButton(
+            onPressed: () {
+              setState(() {
+                sortColumn = 0;
+              });
+            },
+            child: Text(
+              'Name',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
         ),
         DataColumn(
-          label: Expanded(
-            child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    sortColumn = 1;
-                  });
-                },
-                child: Text(
-                  'Version',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                )),
+          label: TextButton(
+            onPressed: () {
+              setState(() {
+                sortColumn = 1;
+              });
+            },
+            child: Text(
+              'Version',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
         ),
         DataColumn(
-          label: Expanded(
-              child: TextButton(
+          label: TextButton(
             onPressed: () {
               setState(() {
                 sortColumn = 2;
@@ -57,12 +58,11 @@ class _TheGridState extends ConsumerState<TheGrid> {
               'Author',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
-          )),
+          ),
         ),
       ],
-      rows: ref
-          .read(AppState.mods)
-          .map((e) => DataRow(
+      rows:
+          mods.map((e) => DataRow(
                 cells: <DataCell>[
                   DataCell(Text(e.name ?? "")),
                   DataCell(Text(e.version.toString() ?? "")),
