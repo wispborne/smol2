@@ -76,8 +76,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var directory =
-          Directory("C:/Program Files (x86)/Fractal Softworks/Starsector/mods");
+      var directory = modFolderPath(defaultGamePath()!)!;
 
       if (true) {
         final timer = Stopwatch()..start();

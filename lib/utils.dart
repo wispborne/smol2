@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 MaterialColor createMaterialColor(Color color) {
   List strengths = <double>[.05];
@@ -19,4 +23,39 @@ MaterialColor createMaterialColor(Color color) {
   }
 
   return MaterialColor(color.value, swatch);
+}
+
+Directory? defaultGamePath() {
+  if (Platform.isWindows) {
+    // todo read from registry
+    return Directory("C:/Program Files (x86)/Fractal Softworks/Starsector");
+  } else if (Platform.isMacOS) {
+    return Directory("/Applications/Starsector.app");
+  } else if (kIsWeb) {
+    return null; // huh
+  } else {
+    return null;
+  }
+}
+
+Directory? gameFilesPath(Directory gamePath) {
+  if (Platform.isWindows) {
+    return Directory(p.join(gamePath.path, "starsector-core"));
+  } else if (Platform.isMacOS) {
+    return Directory(p.join(gamePath.path, "Contents/Resources/Java"));
+  } else if (kIsWeb) {
+    return null; // huh
+  } else {
+    return null;
+  }
+}
+
+Directory? modFolderPath(Directory gamePath) {
+  if (Platform.isWindows || Platform.isMacOS) {
+    return Directory(p.join(gamePath.path, "mods"));
+  } else if (kIsWeb) {
+    return null; // huh
+  } else {
+    return null;
+  }
 }
