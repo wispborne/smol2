@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smol2/appState.dart';
 import 'package:smol2/modLoader.dart';
 import 'package:smol2/shortcuts.dart';
 import 'package:smol2/theGrid.dart';
@@ -79,44 +78,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var directory = modFolderPath(defaultGamePath()!)!;
-
-      if (true) {
-        final timer = Stopwatch()..start();
-        var loadedCount = 0;
-        var failedCount = 0;
-        directory
-            .list(recursive: true)
-            .where((file) =>
-                (file is File) && file.uri.pathSegments.last == "mod_info.json")
-            .asyncMap((modInfoFile) {
-          Fimber.i("Loading ${modInfoFile.path}");
-          return loadModInfo(modInfoFile as File).then((value) {
-            Fimber.d(value?.toString() ?? "");
-            if (value != null) {
-              loadedCount++;
-              ref
-                  .read(AppState.mods.notifier)
-                  .update((state) => state..add(value));
-            }
-          }).catchError((error, stackTrace) {
-            failedCount++;
-            Fimber.w("Failed to parse ${modInfoFile.path}",
-                ex: error, stacktrace: stackTrace);
-          });
-        })
-        .listen((event) { }, onDone: () => Fimber.i("Finished loading $loadedCount mod infos in ${timer.elapsedMilliseconds} ms ($failedCount failed)."));
-      }
-
-      // directory.list().where((file) => file is Directory).forEach((element) {
-      //   Fimber.d("Watching $element");
-      //   directory.watch(recursive: true)
-      //       .listen((event) {
-      //     Fimber.d("$event");
-      //   },
-      //           onError: (e) => Fimber.w(e),
-      //           onDone: () => Fimber.i("Stopped watching ${directory.path}"));
-      // });
+      reloadMods(ref);
     });
   }
 }

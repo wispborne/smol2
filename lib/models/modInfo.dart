@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:smol2/models/modInfoDependency.dart';
 import 'package:smol2/models/version.dart';
-import 'package:smol2/models/versionConverter.dart';
+import 'package:smol2/models/converters/versionConverter.dart';
 
 part '../generated/models/modInfo.freezed.dart';
 

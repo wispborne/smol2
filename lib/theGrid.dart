@@ -18,16 +18,20 @@ class _TheGridState extends ConsumerState<TheGrid> {
   @override
   Widget build(BuildContext context) {
     final mods = ref.watch(AppState.mods)..sort((l, r) {
+      int result = 0;
       switch (_sortColumn) {
         case 0:
-          return l.name?.compareTo(r.name ?? "") ?? 0;
+          result = l.name?.compareTo(r.name ?? "") ?? 0;
+          break;
         case 1:
-          return l.version?.raw?.compareTo(r.version?.raw ?? "") ?? 0;
+          result = l.version.raw?.compareTo(r.version.raw ?? "") ?? 0;
+          break;
         case 2:
-          return l.author?.compareTo(r.author ?? "") ?? 0;
-        default:
-          return l.name?.compareTo(r.name ?? "") ?? 0;
+          result = l.author?.compareTo(r.author ?? "") ?? 0;
+          break;
       }
+
+      return result * (_isAsc ? 1 : -1);
     });
     final columnNames = ["Name", "Version", "Author"];
 
